@@ -14,7 +14,6 @@ public class LoggerModel : BindableBase
 
     public LoggerModel(string time, string uid, bool isPost, string status)
     {
-
         var post = isPost ? "Post" : "Message";
         LogMessage = $"[{time}] UID:{uid} {post} {status}";
     }

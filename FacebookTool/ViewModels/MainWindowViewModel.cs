@@ -1,4 +1,5 @@
-﻿using FacebookTool.Models;
+﻿using FacebookTool.Helpers;
+using FacebookTool.Models;
 using OpenQA.Selenium.Chrome;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -10,7 +11,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using FacebookTool.Helpers;
 
 namespace FacebookTool.ViewModels
 {
@@ -30,6 +30,7 @@ namespace FacebookTool.ViewModels
             get { return _title; }
             set { SetProperty(ref _title, value); }
         }
+
         /// <summary>
         /// Danh sách cookie tài khoản facebook
         /// </summary>
@@ -38,6 +39,7 @@ namespace FacebookTool.ViewModels
             get => _cookies;
             set => SetProperty(ref _cookies, value);
         }
+
         /// <summary>
         /// Id tài khoản facebook
         /// </summary>
@@ -46,6 +48,7 @@ namespace FacebookTool.ViewModels
             get => _uids;
             set => SetProperty(ref _uids, value);
         }
+
         /// <summary>
         /// Id các bài viết
         /// </summary>
@@ -54,6 +57,7 @@ namespace FacebookTool.ViewModels
             get => _message;
             set => SetProperty(ref _message, value);
         }
+
         /// <summary>
         /// Thời gian dừng giữa các lần chạy
         /// </summary>
@@ -62,6 +66,7 @@ namespace FacebookTool.ViewModels
             get => _timeDelays;
             set => SetProperty(ref _timeDelays, value);
         }
+
         /// <summary>
         /// Trạng thái ứng dụng có đang chạy không
         /// </summary>
@@ -70,10 +75,12 @@ namespace FacebookTool.ViewModels
             get => _isRunApp;
             set => SetProperty(ref _isRunApp, value);
         }
+
         /// <summary>
         /// Lấy cookie
         /// </summary>
         public ICommand GetCookieCommand { get; private set; }
+
         /// <summary>
         /// Chạy ứng dụng
         /// </summary>
@@ -86,6 +93,7 @@ namespace FacebookTool.ViewModels
         }
 
         private BackgroundWorker _backgroundWorker;
+
         public MainWindowViewModel()
         {
             GetCookieCommand = new DelegateCommand(async () => await GetCookieCommandExcute());
@@ -100,7 +108,6 @@ namespace FacebookTool.ViewModels
 
         private void worker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e)
         {
-
         }
 
         private void worker_ProgressChanged(object? sender, ProgressChangedEventArgs e)

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using FacebookTool.Models;
+using RestSharp;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using FacebookTool.Models;
-using RestSharp;
 
 namespace FacebookTool.Helpers;
 
@@ -47,6 +47,7 @@ public static class FacebookHelper
 
         return false;
     }
+
     public static async Task<Facebooks> GetParaFacebook(Facebooks facebook)
     {
         var client = new RestClient("https://d.facebook.com/messages/read/?fbid=" + facebook.id);

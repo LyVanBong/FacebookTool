@@ -16,7 +16,6 @@ namespace FacebookTool
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-
         }
     }
 }
