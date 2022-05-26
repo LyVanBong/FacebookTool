@@ -27,15 +27,16 @@
             </Grid.ColumnDefinitions>
             <TextBox
                 Grid.Column="0"
+                Margin="5"
                 VerticalContentAlignment="Center"
                 Text="{Binding Search}" />
             <Button
                 Grid.Column="1"
-                Width="70"
+                Width="100"
+                Margin="5"
                 HorizontalAlignment="Right"
                 Command="{Binding RunCommand}"
-                Content="Scan"
-                FontSize="20" />
+                Content="Scan" />
         </Grid>
         <GroupBox
             Grid.Row="1"
