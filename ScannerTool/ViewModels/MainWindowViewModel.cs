@@ -74,13 +74,36 @@ namespace ScannerTool.ViewModels
         }
         private async Task ExecuteRunCommand()
         {
+            try
+            {
+                var content = await RequestSite(Search);
+                _urls = await ScanUrl(content);
+                foreach (var url in _urls)
+                {
+                    if (!string.IsNullOrWhiteSpace(url))
+                    {
+                        var ctent = await RequestSite(url);
+                        var urls = await ScanUrl(content);
+                        if (urls.Any())
+                        {
+                            _urls.AddRange(urls);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+        }
 
-            string patter = "http(.*?)\"";
-            var str = await RequestSite(Search);
-            var matches = Regex.Matches(str, patter);
+        private Task<List<string>> ScanUrl(string content)
+        {
+            string patter = "http(.*?)://(.*?)\"";
+            var urls = new List<string>();
+            var matches = Regex.Matches(content, patter);
             if (matches.Any())
             {
-                _urls = new List<string>();
                 int i = 1;
                 foreach (Match m in matches)
                 {
@@ -88,9 +111,11 @@ namespace ScannerTool.ViewModels
                     var a = s.TrimEnd('"');
                     Debug.WriteLine(i + ": " + a);
                     i++;
-                    _urls.Add(a);
+                    urls.Add(a);
                 }
             }
+
+            return Task.FromResult(urls.Distinct().ToList());
         }
     }
 }
