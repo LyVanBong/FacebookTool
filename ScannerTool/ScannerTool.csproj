@@ -6,5 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Prism.Unity" Version="8.1.97" />
+    <PackageReference Include="RestSharp" Version="107.3.0" />
   </ItemGroup>
 </Project>
