@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -77,44 +78,55 @@ namespace ScannerTool.ViewModels
         {
 
         }
-        private Task ExecuteExportDataCommand()
+        private async Task ExecuteExportDataCommand()
         {
-            if (!IsBusy)
+            try
             {
-                MessageBox.Show("Tool đang quét dữ liệu không thể xuất file");
-                return Task.CompletedTask;
-            }
-            if (Emails.Any() || PhoneNums.Any())
-            {
-                var dialog = new VistaFolderBrowserDialog();
-                dialog.Multiselect = false;
-                dialog.Description = "Please select a folder.";
-                dialog.UseDescriptionForTitle = true;
-
-                if (!VistaFolderBrowserDialog.IsVistaFolderDialogSupported)
+                if (!IsBusy)
                 {
-                    MessageBox.Show("Because you are not using Windows Vista or later, the regular folder browser dialog will be used. Please use Windows Vista to see the new dialog.", "Sample folder browser dialog");
+                    MessageBox.Show("Tool đang quét dữ liệu không thể xuất file");
+                    return;
                 }
 
-                if (dialog.ShowDialog() == true)
+                if (Emails.Any() || PhoneNums.Any())
                 {
-                    var selectedPaths = dialog.SelectedPaths;
-                    if (selectedPaths != null && selectedPaths[0] != null)
+                    var dialog = new VistaFolderBrowserDialog();
+                    dialog.Multiselect = false;
+                    dialog.Description = "Please select a folder.";
+                    dialog.UseDescriptionForTitle = true;
+
+                    if (!VistaFolderBrowserDialog.IsVistaFolderDialogSupported)
                     {
-                        var pathEmail = selectedPaths[0] + "\\email_" + DateTime.Now.Ticks + ".txt";
-                        var pathPhone = selectedPaths[0] + "\\phone_" + DateTime.Now.Ticks + ".txt";
-                        File.WriteAllTextAsync(pathEmail, string.Join("\n", Emails.Select(e => e.Title)));
-                        File.WriteAllTextAsync(pathPhone, string.Join("\n", PhoneNums.Select(e => e.Title)));
-                        File.Open(pathPhone, FileMode.Open);
-                        File.Open(pathEmail, FileMode.Open);
+                        MessageBox.Show(
+                            "Because you are not using Windows Vista or later, the regular folder browser dialog will be used. Please use Windows Vista to see the new dialog.",
+                            "Sample folder browser dialog");
+                    }
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        var selectedPaths = dialog.SelectedPaths;
+                        if (selectedPaths != null && selectedPaths[0] != null)
+                        {
+                            var name = new Uri(UrlScanData);
+                            var pathEmail = selectedPaths[0] + "\\email_" + name.Authority.Replace(".", "_") + "_" + DateTime.Now.Ticks + ".txt";
+                            var pathPhone = selectedPaths[0] + "\\phone_" + DateTime.Now.Ticks + ".txt";
+                            await File.WriteAllTextAsync(pathEmail, string.Join("\n", Emails.Select(e => e.Title)));
+                            await File.WriteAllTextAsync(pathPhone, string.Join("\n", PhoneNums.Select(e => e.Title)));
+                            Process.Start(pathPhone);
+                            Process.Start(pathEmail);
+                        }
                     }
                 }
+                else
+                {
+                    MessageBox.Show("Data empty");
+                }
             }
-            else
+            catch (Exception e)
             {
-                MessageBox.Show("Data empty");
+                Debug.WriteLine(e.Message);
+                MessageBox.Show(e.Message, "Notification", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            return Task.CompletedTask;
         }
         private async Task<string> RequestSite(string url)
         {
@@ -211,7 +223,7 @@ namespace ScannerTool.ViewModels
                         if (u.Any())
                         {
                             _ = Task.WhenAny(u.Select(x => RequestSite(x)));
-                            await Task.Delay(1000);
+                            await Task.Delay(3000);
                         }
                     }
                 }
