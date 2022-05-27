@@ -13,7 +13,7 @@
             <RowDefinition Height="40" />
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
-            <RowDefinition Height="100" />
+            <RowDefinition Height="200" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -70,5 +70,18 @@
             Command="{Binding ExportDataCommand}"
             Content="Export Data"
             FontSize="18" />
+        <GroupBox
+            Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Header="Logging">
+            <ListBox ItemsSource="{Binding Logs}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding Title}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
     </Grid>
 </Window>

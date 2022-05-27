@@ -1,10 +1,12 @@
-﻿using Prism.Commands;
+﻿using Ookii.Dialogs.Wpf;
+using Prism.Commands;
 using Prism.Mvvm;
 using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -29,6 +31,12 @@ namespace ScannerTool.ViewModels
 
         public DelegateCommand RunCommand =>
             _runCommand ?? (_runCommand = new DelegateCommand(() => ExecuteRunCommand()));
+
+        public ObservableCollection<Item> Logs
+        {
+            get => _logs;
+            set => SetProperty(ref _logs, value);
+        }
 
         public string UrlScanData
         {
@@ -63,6 +71,7 @@ namespace ScannerTool.ViewModels
         private List<string> _lsEmail = new List<string>();
         private List<string> _lsPhone = new List<string>();
         private List<string> _lsHtml;
+        private ObservableCollection<Item> _logs = new ObservableCollection<Item>();
 
         public MainWindowViewModel()
         {
@@ -70,7 +79,41 @@ namespace ScannerTool.ViewModels
         }
         private Task ExecuteExportDataCommand()
         {
+            if (!IsBusy)
+            {
+                MessageBox.Show("Tool đang quét dữ liệu không thể xuất file");
+                return Task.CompletedTask;
+            }
+            if (Emails.Any() || PhoneNums.Any())
+            {
+                var dialog = new VistaFolderBrowserDialog();
+                dialog.Multiselect = false;
+                dialog.Description = "Please select a folder.";
+                dialog.UseDescriptionForTitle = true;
 
+                if (!VistaFolderBrowserDialog.IsVistaFolderDialogSupported)
+                {
+                    MessageBox.Show("Because you are not using Windows Vista or later, the regular folder browser dialog will be used. Please use Windows Vista to see the new dialog.", "Sample folder browser dialog");
+                }
+
+                if (dialog.ShowDialog() == true)
+                {
+                    var selectedPaths = dialog.SelectedPaths;
+                    if (selectedPaths != null && selectedPaths[0] != null)
+                    {
+                        var pathEmail = selectedPaths[0] + "\\email_" + DateTime.Now.Ticks + ".txt";
+                        var pathPhone = selectedPaths[0] + "\\phone_" + DateTime.Now.Ticks + ".txt";
+                        File.WriteAllTextAsync(pathEmail, string.Join("\n", Emails.Select(e => e.Title)));
+                        File.WriteAllTextAsync(pathPhone, string.Join("\n", PhoneNums.Select(e => e.Title)));
+                        File.Open(pathPhone, FileMode.Open);
+                        File.Open(pathEmail, FileMode.Open);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Data empty");
+            }
             return Task.CompletedTask;
         }
         private async Task<string> RequestSite(string url)
@@ -156,6 +199,7 @@ namespace ScannerTool.ViewModels
                 _nums = 1;
                 Emails.Clear();
                 PhoneNums.Clear();
+                Logs.Clear();
                 var time = new Stopwatch();
                 time.Start();
                 var htmls = await GetHtml();
@@ -195,7 +239,7 @@ namespace ScannerTool.ViewModels
             {
                 htmls.Add(await RequestSite(url));
                 num++;
-                Debug.WriteLine(num + " : " + url + " : " + DateTime.Now.ToString("g") + "\n");
+                Logs.Insert(0, new Item($"[{DateTime.Now.ToString("G")}] " + url));
             }
             return htmls;
         }
@@ -220,7 +264,7 @@ namespace ScannerTool.ViewModels
                         {
                             urls.Add(a);
                         }
-                        Debug.WriteLine(_nums + ": " + a);
+                        Logs.Insert(0, new Item($"[{DateTime.Now.ToString("G")}] " + a));
                     }
                 }
 
@@ -239,7 +283,7 @@ namespace ScannerTool.ViewModels
                         {
                             urls.Add(u);
                         }
-                        Debug.WriteLine(_nums + ": " + u);
+                        Logs.Insert(0, new Item($"[{DateTime.Now.ToString("G")}] " + u));
                     }
                 }
                 return Task.FromResult(urls.Distinct().ToList());
