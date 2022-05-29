@@ -258,7 +258,6 @@ namespace FacebookTool.ViewModels
                     var cookies = driver.Manage().Cookies.AllCookies;
                     if (cookies.Any())
                     {
-
                         string ck = string.Empty;
                         foreach (var c in cookies)
                         {

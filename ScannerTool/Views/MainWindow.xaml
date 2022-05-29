@@ -69,7 +69,8 @@
             Margin="5"
             Command="{Binding ExportDataCommand}"
             Content="Export Data"
-            FontSize="18" />
+            FontSize="18"
+            IsEnabled="{Binding IsBusy}" />
         <GroupBox
             Grid.Row="3"
             Grid.Column="0"

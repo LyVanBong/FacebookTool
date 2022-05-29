@@ -8,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,11 +23,11 @@ namespace ScannerTool.ViewModels
             get { return _title; }
             set { SetProperty(ref _title, value); }
         }
+
         private DelegateCommand _runCommand;
         private string _urlScanData;
         private ObservableCollection<Item> _emails = new ObservableCollection<Item>();
         private ObservableCollection<Item> _phoneNums = new ObservableCollection<Item>();
-        private List<string> _urls;
 
         public DelegateCommand RunCommand =>
             _runCommand ?? (_runCommand = new DelegateCommand(() => ExecuteRunCommand()));
@@ -56,7 +55,7 @@ namespace ScannerTool.ViewModels
             get => _phoneNums;
             set => SetProperty(ref _phoneNums, value);
         }
-        private int _nums;
+
         private bool _isBusy = true;
 
         public bool IsBusy
@@ -64,20 +63,18 @@ namespace ScannerTool.ViewModels
             get => _isBusy;
             set => SetProperty(ref _isBusy, value);
         }
+
         private DelegateCommand _exportDataCommand;
+
         public DelegateCommand ExportDataCommand =>
             _exportDataCommand ?? (_exportDataCommand = new DelegateCommand(() => ExecuteExportDataCommand()));
 
-        private List<string> _requestUrl = new List<string>();
-        private List<string> _lsEmail = new List<string>();
-        private List<string> _lsPhone = new List<string>();
-        private List<string> _lsHtml;
         private ObservableCollection<Item> _logs = new ObservableCollection<Item>();
 
         public MainWindowViewModel()
         {
-
         }
+
         private async Task ExecuteExportDataCommand()
         {
             try
@@ -128,30 +125,34 @@ namespace ScannerTool.ViewModels
                 MessageBox.Show(e.Message, "Notification", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        private async Task<string> RequestSite(string url)
+
+        private async Task RequestSite(string url)
         {
-            if (url != null)
+            try
             {
-                if (!_requestUrl.Contains(url))
+                var client = new RestClient(url);
+                var request = new RestRequest();
+                request.Method = Method.Get;
+                var response = await client.ExecuteGetAsync(request);
+                var content = response?.Content;
+                if (!string.IsNullOrWhiteSpace(content))
                 {
-                    _requestUrl.Add(url);
-                    var client = new RestClient(url);
-                    var request = new RestRequest();
-                    request.Method = Method.Get;
-                    var response = await client.ExecuteGetAsync(request);
-                    if (response.IsSuccessful && !string.IsNullOrWhiteSpace(response?.Content))
-                    {
-                        _ = ScanEmail(response.Content);
-                        _ = ScanPhoneNum(response.Content);
-                        _ = ScanUrl(response.Content);
-                        return response.Content;
-                    }
+                    _ = ScanEmail(content);
+                    _ = ScanPhoneNum(content);
+                    await ScanUrl(content);
                 }
             }
-
-            return null;
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
         }
 
+        /// <summary>
+        /// Sacn phone
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
         private Task ScanPhoneNum(string content)
         {
             if (content != null)
@@ -165,11 +166,8 @@ namespace ScannerTool.ViewModels
                         var s = o.Groups[0].Value;
                         if (!string.IsNullOrWhiteSpace(s))
                         {
-                            if (!_lsPhone.Contains(s))
-                            {
-                                _lsPhone.Add(s);
-                                PhoneNums.Add(new Item(s));
-                            }
+                            if (PhoneNums.Count(x => x.Title == s) == 0)
+                                PhoneNums.Insert(0, new Item(s));
                         }
                     }
                 }
@@ -178,6 +176,11 @@ namespace ScannerTool.ViewModels
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// scan email
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
         private Task ScanEmail(string content)
         {
             if (content != null)
@@ -191,11 +194,8 @@ namespace ScannerTool.ViewModels
                         var s = o.Groups[0].Value;
                         if (!string.IsNullOrWhiteSpace(s))
                         {
-                            if (!_lsEmail.Contains(s))
-                            {
-                                _lsEmail.Add(s);
-                                Emails.Add(new Item(s));
-                            }
+                            if (Emails.Count(x => x.Title == s) == 0)
+                                Emails.Insert(0, new Item(s));
                         }
                     }
                 }
@@ -203,36 +203,39 @@ namespace ScannerTool.ViewModels
 
             return Task.CompletedTask;
         }
+
+        private List<string> _listUrl = new List<string>();
+        private int _num;
+
         private async Task ExecuteRunCommand()
         {
             try
             {
                 IsBusy = false;
-                _nums = 1;
                 Emails.Clear();
                 PhoneNums.Clear();
                 Logs.Clear();
-                var time = new Stopwatch();
-                time.Start();
-                var htmls = await GetHtml();
-                if (htmls != null)
+                if (string.IsNullOrWhiteSpace(UrlScanData))
                 {
-                    foreach (var html in htmls)
-                    {
-                        var u = await ScanUrl(html);
-                        if (u.Any())
-                        {
-                            _ = Task.WhenAny(u.Select(x => RequestSite(x)));
-                            await Task.Delay(3000);
-                        }
-                    }
+                    MessageBox.Show("Chưa nhập url cần quét email số điện thoại");
                 }
-                time.Stop();
-                MessageBox.Show("Scan data done: " + time.ElapsedMilliseconds / 1000 + " (S)", "Notification", MessageBoxButton.OK, MessageBoxImage.Information);
+                else
+                {
+                    UrlScanData = UrlScanData[UrlScanData.Length - 1] == '/' ? UrlScanData : UrlScanData + "/";
+                    _listUrl.Add(UrlScanData);
+                    while (true)
+                    {
+                        await RequestSite(_listUrl[_num]);
+                        _num++;
+
+                        if (_num == _listUrl.Count) break;
+                    }
+
+                    MessageBox.Show("Quét dữ liệu xong");
+                }
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e.Message);
                 MessageBox.Show(e.Message, "Notification", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
@@ -241,67 +244,54 @@ namespace ScannerTool.ViewModels
             }
         }
 
-        private async Task<List<string>> GetHtml()
+        private int _numScanUrl = 1;
+
+        /// <summary>
+        /// sacn url
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private Task ScanUrl(string content)
         {
-            var htmls = new List<string>();
-            htmls.Add(await RequestSite(UrlScanData));
-            var urls = (await ScanUrl(htmls[0])).Distinct().ToList();
-            var num = 1;
-            foreach (var url in urls)
+            var host = (new Uri(UrlScanData)).Authority;
+
+            string patter = "http(s*)://(.*?)\"";
+            var matches = Regex.Matches(content, patter);
+            if (matches.Any())
             {
-                htmls.Add(await RequestSite(url));
-                num++;
-                Logs.Insert(0, new Item($"[{DateTime.Now.ToString("G")}] " + url));
-            }
-            return htmls;
-        }
-
-        private Task<List<string>> ScanUrl(string content)
-        {
-            var urls = new List<string>();
-            if (content != null)
-            {
-                string patter = "http(s*)://(.*?)\"";
-
-                var matches = Regex.Matches(content, patter);
-                if (matches.Any())
+                foreach (Match m in matches)
                 {
+                    var s = m.Groups[0].Value;
+                    var a = s.TrimEnd('"');
 
-                    foreach (Match m in matches)
-                    {
-                        var s = m.Groups[0].Value;
-                        var a = s.TrimEnd('"');
-                        _nums++;
-                        if (!_requestUrl.Contains(a))
-                        {
-                            urls.Add(a);
-                        }
-                        Logs.Insert(0, new Item($"[{DateTime.Now.ToString("G")}] " + a));
-                    }
+                    if (a.Contains(host))
+                        if (!_listUrl.Contains(a))
+                            _listUrl.Add(a);
+
+                    Logs.Insert(0, new Item($"{_numScanUrl} : [{DateTime.Now.ToString("G")}] " + a));
+                    _numScanUrl++;
                 }
-
-                var patterHref = "href=\"/(.*?)\"";
-
-                var matchesHref = Regex.Matches(content, patterHref);
-                if (matchesHref.Any())
-                {
-                    foreach (Match mh in matchesHref)
-                    {
-                        var s = mh.Groups[1].Value;
-                        var a = s.TrimEnd('"');
-                        _nums++;
-                        var u = a.Contains("html") ? a : UrlScanData + a;
-                        if (!_requestUrl.Contains(a))
-                        {
-                            urls.Add(u);
-                        }
-                        Logs.Insert(0, new Item($"[{DateTime.Now.ToString("G")}] " + u));
-                    }
-                }
-                return Task.FromResult(urls.Distinct().ToList());
             }
 
-            return Task.FromResult(urls);
+            var patterHref = "href=\"/(.*?)\"";
+            var matchesHref = Regex.Matches(content, patterHref);
+            if (matchesHref.Any())
+            {
+                foreach (Match mh in matchesHref)
+                {
+                    var s = mh.Groups[1].Value;
+                    var a = s.TrimEnd('"');
+                    var u = a.Contains("html") ? a : UrlScanData + a;
+
+                    if (u.Contains(host))
+                        if (!_listUrl.Contains(u))
+                            _listUrl.Add(u);
+
+                    Logs.Insert(0, new Item($"{_numScanUrl} : [{DateTime.Now.ToString("G")}] " + u));
+                    _numScanUrl++;
+                }
+            }
+            return Task.CompletedTask;
         }
     }
 
