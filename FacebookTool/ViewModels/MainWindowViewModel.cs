@@ -249,40 +249,52 @@ namespace FacebookTool.ViewModels
             set => SetProperty(ref _isGetCookie, value);
         }
 
-        private async Task GetCookieCommandExcute()
+        private Task GetCookieCommandExcute()
         {
-            if (IsGetCookie)
+            try
             {
-                var cookies = driver.Manage().Cookies.AllCookies;
-                if (cookies.Any())
+                if (IsGetCookie)
                 {
-                    IsGetCookie = false;
-                    string ck = string.Empty;
-                    foreach (var c in cookies)
+                    var cookies = driver.Manage().Cookies.AllCookies;
+                    if (cookies.Any())
                     {
-                        if (string.IsNullOrEmpty(ck)) ck = c.Name + "=" + c.Value;
-                        else ck += ";" + c.Name + "=" + c.Value;
-                    }
 
-                    if (string.IsNullOrWhiteSpace(Cookies)) Cookies = ck;
-                    else Cookies += "\n" + ck;
-                    StrCookie = "Đăng nhập facebook";
+                        string ck = string.Empty;
+                        foreach (var c in cookies)
+                        {
+                            if (string.IsNullOrEmpty(ck)) ck = c.Name + "=" + c.Value;
+                            else ck += ";" + c.Name + "=" + c.Value;
+                        }
+
+                        if (ck.Contains("c_user="))
+                        {
+                            IsGetCookie = false;
+                            if (string.IsNullOrWhiteSpace(Cookies)) Cookies = ck;
+                            else Cookies += "\n" + ck;
+                            StrCookie = "Đăng nhập facebook";
+                        }
+                    }
+                    driver.Quit();
                 }
-                driver.Quit();
+                else
+                {
+                    IsGetCookie = true;
+                    Random rd = new Random();
+                    var driverService = ChromeDriverService.CreateDefaultService();
+                    driverService.HideCommandPromptWindow = true;
+                    ChromeOptions option = new ChromeOptions();
+                    driver = new ChromeDriver(driverService, option);
+                    driver.Manage().Window.Size = new Size(250, 844);
+                    driver.Manage().Window.Position = new Point(0, 0);
+                    driver.Navigate().GoToUrl("https://m.facebook.com/");
+                    StrCookie = "Lấy cookie";
+                }
             }
-            else
+            catch (Exception e)
             {
-                IsGetCookie = true;
-                Random rd = new Random();
-                var driverService = ChromeDriverService.CreateDefaultService();
-                driverService.HideCommandPromptWindow = true;
-                ChromeOptions option = new ChromeOptions();
-                driver = new ChromeDriver(driverService, option);
-                driver.Manage().Window.Size = new Size(250, 844);
-                driver.Manage().Window.Position = new Point(0, 0);
-                driver.Navigate().GoToUrl("https://m.facebook.com/");
-                StrCookie = "Lấy cookie";
+                MessageBox.Show(e.Message);
             }
+            return Task.CompletedTask;
         }
     }
 }
