@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 
 namespace FacebookTool.ViewModels
 {
@@ -24,6 +26,12 @@ namespace FacebookTool.ViewModels
         private bool _isRunApp;
         private ObservableCollection<LoggerModel> _logs = new ObservableCollection<LoggerModel>();
         private List<Facebooks> _facebooks;
+
+        public string StrCookie
+        {
+            get => _strCookie;
+            set => SetProperty(ref _strCookie, value);
+        }
 
         public string Title
         {
@@ -93,6 +101,7 @@ namespace FacebookTool.ViewModels
         }
 
         private BackgroundWorker _backgroundWorker;
+        private string _strCookie = "Đăng nhập facebook";
 
         public MainWindowViewModel()
         {
@@ -231,15 +240,49 @@ namespace FacebookTool.ViewModels
             }
         }
 
+        private ChromeDriver driver;
+        private bool _isGetCookie;
+
+        public bool IsGetCookie
+        {
+            get => _isGetCookie;
+            set => SetProperty(ref _isGetCookie, value);
+        }
+
         private async Task GetCookieCommandExcute()
         {
-            Random rd = new Random();
-            var driverService = ChromeDriverService.CreateDefaultService();
-            driverService.HideCommandPromptWindow = true;
-            ChromeOptions option = new ChromeOptions();
-            ChromeDriver driver = new ChromeDriver(driverService, option);
+            if (IsGetCookie)
+            {
+                var cookies = driver.Manage().Cookies.AllCookies;
+                if (cookies.Any())
+                {
+                    IsGetCookie = false;
+                    string ck = string.Empty;
+                    foreach (var c in cookies)
+                    {
+                        if (string.IsNullOrEmpty(ck)) ck = c.Name + "=" + c.Value;
+                        else ck += ";" + c.Name + "=" + c.Value;
+                    }
 
-            driver.Navigate().GoToUrl("https://www.facebook.com/");
+                    if (string.IsNullOrWhiteSpace(Cookies)) Cookies = ck;
+                    else Cookies += "\n" + ck;
+                    StrCookie = "Đăng nhập facebook";
+                }
+                driver.Quit();
+            }
+            else
+            {
+                IsGetCookie = true;
+                Random rd = new Random();
+                var driverService = ChromeDriverService.CreateDefaultService();
+                driverService.HideCommandPromptWindow = true;
+                ChromeOptions option = new ChromeOptions();
+                driver = new ChromeDriver(driverService, option);
+                driver.Manage().Window.Size = new Size(250, 844);
+                driver.Manage().Window.Position = new Point(0, 0);
+                driver.Navigate().GoToUrl("https://m.facebook.com/");
+                StrCookie = "Lấy cookie";
+            }
         }
     }
 }

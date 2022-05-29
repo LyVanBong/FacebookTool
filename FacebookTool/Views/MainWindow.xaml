@@ -21,23 +21,37 @@
             Grid.Row="0"
             Grid.Column="0"
             Header="Account facebook">
-            <TextBox
-                AcceptsReturn="True"
-                Text="{Binding Cookies}"
-                TextWrapping="Wrap">
-                <TextBox.Style>
-                    <Style TargetType="TextBox">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsRunApp}" Value="True">
-                                <Setter Property="IsEnabled" Value="False" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding IsRunApp}" Value="False">
-                                <Setter Property="IsEnabled" Value="True" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBox.Style>
-            </TextBox>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBox
+                    Grid.Row="0"
+                    AcceptsReturn="True"
+                    Text="{Binding Cookies}"
+                    TextWrapping="Wrap">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsRunApp}" Value="True">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsRunApp}" Value="False">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+                <Button
+                    Grid.Row="1"
+                    Height="40"
+                    Margin="5"
+                    Command="{Binding GetCookieCommand}"
+                    Content="{Binding StrCookie}" />
+            </Grid>
         </GroupBox>
         <Grid Grid.Row="1" Grid.Column="0">
             <Grid.RowDefinitions>
