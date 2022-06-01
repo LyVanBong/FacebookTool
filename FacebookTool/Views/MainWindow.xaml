@@ -1,8 +1,8 @@
 ﻿<Window
     x:Class="FacebookTool.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:prism="http://prismlibrary.com/"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="{Binding Title}"
     Width="Auto"
     Height="Auto"
@@ -20,7 +20,7 @@
         <GroupBox
             Grid.Row="0"
             Grid.Column="0"
-            Header="Account facebook">
+            Header="Account facebook (Không tự tắt google chrome)">
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -59,23 +59,36 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0" Header="UID">
-                <TextBox
-                    AcceptsReturn="True"
-                    Text="{Binding Uids}"
-                    TextWrapping="Wrap">
-                    <TextBox.Style>
-                        <Style TargetType="TextBox">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsRunApp}" Value="True">
-                                    <Setter Property="IsEnabled" Value="False" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsRunApp}" Value="False">
-                                    <Setter Property="IsEnabled" Value="True" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBox.Style>
-                </TextBox>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBox
+                        Grid.Row="0"
+                        AcceptsReturn="True"
+                        Text="{Binding Uids}"
+                        TextWrapping="Wrap">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRunApp}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsRunApp}" Value="False">
+                                        <Setter Property="IsEnabled" Value="True" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Button
+                        Grid.Row="1"
+                        Height="40"
+                        Margin="5"
+                        Click="ButtonBase_OnClick"
+                        Content="Scan Uid Facebook" />
+                </Grid>
             </GroupBox>
             <GroupBox Grid.Row="1" Header="Message">
                 <TextBox

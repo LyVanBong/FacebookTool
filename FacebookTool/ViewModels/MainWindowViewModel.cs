@@ -18,7 +18,7 @@ namespace FacebookTool.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        private string _title = @"Sent Message Facebook Tool";
+        private string _title = @"Messenger tool";
         private string _cookies;
         private string _uids;
         private string _message;

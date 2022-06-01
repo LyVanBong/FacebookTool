@@ -1,0 +1,11 @@
+﻿<Window
+    x:Class="FacebookTool.Views.ScanUidWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:prism="http://prismlibrary.com/"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Button Click="ButtonBase_OnClick" Content="Go Back" />
+    </Grid>
+</Window>
