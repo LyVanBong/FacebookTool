@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 
 namespace FacebookTool.Views
 {
@@ -12,11 +13,10 @@ namespace FacebookTool.Views
             InitializeComponent();
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        private void ScanUidWindow_OnClosing(object sender, CancelEventArgs e)
         {
-            var main = new MainWindow();
+            MainWindow main = new MainWindow();
             main.Show();
-            this.Close();
         }
     }
 }

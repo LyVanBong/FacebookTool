@@ -9,6 +9,8 @@ namespace FacebookTool
     /// </summary>
     public partial class App
     {
+
+        public static string Coookie { get; set; }
         protected override Window CreateShell()
         {
             return Container.Resolve<MainWindow>();

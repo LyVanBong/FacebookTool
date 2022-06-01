@@ -22,9 +22,17 @@ namespace FacebookTool.Views
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            var scanUidWindow = new ScanUidWindow();
-            scanUidWindow.Show();
-            this.Close();
+            if (bCookie?.Text == null)
+            {
+                MessageBox.Show("Bạn cần có cookie trước khi quét uid");
+            }
+            else
+            {
+                App.Coookie = bCookie.Text;
+                var scanUidWindow = new ScanUidWindow();
+                scanUidWindow.Show();
+                this.Close();
+            }
         }
     }
 }
