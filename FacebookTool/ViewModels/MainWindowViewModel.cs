@@ -278,7 +278,6 @@ namespace FacebookTool.ViewModels
                 else
                 {
                     IsGetCookie = true;
-                    Random rd = new Random();
                     var driverService = ChromeDriverService.CreateDefaultService();
                     driverService.HideCommandPromptWindow = true;
                     ChromeOptions option = new ChromeOptions();

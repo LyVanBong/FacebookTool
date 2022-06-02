@@ -17,7 +17,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="30" />
+            <ColumnDefinition Width="50" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <TextBox
@@ -56,7 +56,7 @@
             AcceptsReturn="True"
             Text="{Binding Uids}"
             TextWrapping="Wrap">
-            <TextBox.Style>
+            <!--<TextBox.Style>
                 <Style TargetType="TextBox">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsRunApp}" Value="True">
@@ -67,7 +67,7 @@
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </TextBox.Style>
+            </TextBox.Style>-->
         </TextBox>
         <Button
             Grid.Row="2"

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 
@@ -22,13 +23,14 @@ namespace FacebookTool.Views
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            if (bCookie?.Text == null)
+            var cookie = bCookie.Text;
+            if (string.IsNullOrWhiteSpace(cookie) || string.IsNullOrEmpty(cookie))
             {
                 MessageBox.Show("Bạn cần có cookie trước khi quét uid");
             }
             else
             {
-                App.Coookie = bCookie.Text;
+                App.Coookie = bCookie.Text.Split("\n", StringSplitOptions.RemoveEmptyEntries)[0];
                 var scanUidWindow = new ScanUidWindow();
                 scanUidWindow.Show();
                 this.Close();

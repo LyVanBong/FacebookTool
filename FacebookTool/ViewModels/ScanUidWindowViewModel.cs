@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using System.Windows;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using Prism.Commands;
 using Prism.Mvvm;
 using RestSharp;
+using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 
 namespace FacebookTool.ViewModels
 {
@@ -13,7 +19,7 @@ namespace FacebookTool.ViewModels
     {
         private string _url;
         private bool _isRunApp;
-        private string _uids;
+        private string _uids = "";
 
         public string Url
         {
@@ -58,6 +64,24 @@ namespace FacebookTool.ViewModels
             {
                 _lsUrl = new List<string>() { _facebook + _controllerGroup + Url };
                 _num = 0;
+                App.Coookie = App.Coookie.Replace(" ", "");
+
+                var driverService = ChromeDriverService.CreateDefaultService();
+                driverService.HideCommandPromptWindow = true;
+                ChromeOptions option = new ChromeOptions();
+                _chromeDriver = new ChromeDriver(driverService, option);
+                _chromeDriver.Manage().Window.Size = new Size(250, 844);
+                _chromeDriver.Manage().Window.Position = new Point(0, 0);
+                _chromeDriver.Navigate().GoToUrl(_facebook);
+
+                var ck = App.Coookie.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                var lsCookie = new List<Cookie>();
+                foreach (var c in ck)
+                {
+                    var value = c.Split('=', StringSplitOptions.RemoveEmptyEntries);
+                    _chromeDriver.Manage().Cookies.AddCookie(new Cookie(value[0], value[1]));
+                }
+                _chromeDriver.Navigate().GoToUrl(_facebook);
                 while (true)
                 {
                     await Task.Delay(1000);
@@ -68,21 +92,20 @@ namespace FacebookTool.ViewModels
                         break;
                     }
                 }
-                MessageBox.Show("Quét uid thành công");
+                MessageBox.Show("Quét uid thành công: " + Uids.Split("\n").Length);
             }
-
+            _chromeDriver.Close();
             IsRunApp = false;
         }
+
+        private ChromeDriver _chromeDriver;
         private async Task RequestSite(string url)
         {
             try
             {
-                var client = new RestClient(url);
-                var request = new RestRequest();
-                request.Method = Method.Get;
-                request.AddHeader("Cookie", App.Coookie);
-                var response = await client.ExecuteAsync(request);
-                var content = response?.Content;
+                _chromeDriver.Navigate().GoToUrl(url);
+                await Task.Delay(1500);
+                var content = _chromeDriver.PageSource;
                 if (!string.IsNullOrWhiteSpace(content))
                 {
                     _ = ScanUid(content);
@@ -98,19 +121,37 @@ namespace FacebookTool.ViewModels
             }
         }
 
-        private async Task ScanUid(string? content)
+        private async Task ScanUid(string content)
         {
-            throw new NotImplementedException();
+            var pattern = @"id=""member_(.*?)""";
+            var maches = Regex.Matches(content, pattern);
+            if (maches.Any())
+            {
+                foreach (Match m in maches)
+                {
+                    var id = m.Groups[1]?.Value;
+                    if (!string.IsNullOrWhiteSpace(id))
+                    {
+                        if (!Uids.Contains(id))
+                        {
+                            Uids = id + "\n" + Uids;
+                        }
+                    }
+                }
+            }
         }
 
-        private async Task ScanUrl(string? content)
+        private async Task ScanUrl(string content)
         {
-            var regex = "m_more_item\" >< a href = \"/(.*?)\"";
+            var regex = @"""m_more_item""><a href=""/(.*?)""";
             var machs = Regex.Match(content, regex);
             var url = machs?.Groups[1]?.Value;
             if (!string.IsNullOrWhiteSpace(url))
             {
-                _lsUrl.Add(_facebook + url);
+                if (!_lsUrl.Contains(url))
+                {
+                    _lsUrl.Add(_facebook + HttpUtility.HtmlDecode(url));
+                }
             }
         }
     }
