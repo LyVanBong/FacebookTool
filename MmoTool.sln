@@ -5,7 +5,11 @@ VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FacebookTool", "FacebookTool\FacebookTool.csproj", "{485AF56C-4414-4D7C-8158-D4853DBAC64A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScannerTool", "ScannerTool\ScannerTool.csproj", "{4C7860E0-CB3F-4F91-8802-4CA433D313F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScannerTool", "ScannerTool\ScannerTool.csproj", "{4C7860E0-CB3F-4F91-8802-4CA433D313F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setups", "Setups", "{6C0ECC07-68AC-4494-87AE-D40CCE1D2ECB}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FacebookTool", "Setups\FacebookTool\FacebookTool.vdproj", "{6FB716B8-EACD-4CE8-BC8B-E27F9C206AC1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +25,14 @@ Global
 		{4C7860E0-CB3F-4F91-8802-4CA433D313F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C7860E0-CB3F-4F91-8802-4CA433D313F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C7860E0-CB3F-4F91-8802-4CA433D313F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FB716B8-EACD-4CE8-BC8B-E27F9C206AC1}.Debug|Any CPU.ActiveCfg = Debug
+		{6FB716B8-EACD-4CE8-BC8B-E27F9C206AC1}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6FB716B8-EACD-4CE8-BC8B-E27F9C206AC1} = {6C0ECC07-68AC-4494-87AE-D40CCE1D2ECB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3F5FE6B4-A34A-4E90-B9DE-4F185E5CF381}
