@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -28,6 +29,23 @@ namespace ScannerTool.ViewModels
         private string _urlScanData;
         private ObservableCollection<Item> _emails = new ObservableCollection<Item>();
         private ObservableCollection<Item> _phoneNums = new ObservableCollection<Item>();
+        private int _numScanUrl = 1;
+        private string _textScan = "Scan";
+        private List<string> _listUrl = new List<string>();
+        private int _num;
+        private string _cookie;
+
+        public string Cookie
+        {
+            get => _cookie;
+            set => SetProperty(ref _cookie, value);
+        }
+
+        public string TextScan
+        {
+            get => _textScan;
+            set => SetProperty(ref _textScan, value);
+        }
 
         public DelegateCommand RunCommand =>
             _runCommand ?? (_runCommand = new DelegateCommand(() => ExecuteRunCommand()));
@@ -133,6 +151,8 @@ namespace ScannerTool.ViewModels
                 var client = new RestClient(url);
                 var request = new RestRequest();
                 request.Method = Method.Get;
+                if (!string.IsNullOrWhiteSpace(Cookie))
+                    request.AddHeader("Cookie", Cookie);
                 var response = await client.ExecuteGetAsync(request);
                 var content = response?.Content;
                 if (!string.IsNullOrWhiteSpace(content))
@@ -204,14 +224,18 @@ namespace ScannerTool.ViewModels
             return Task.CompletedTask;
         }
 
-        private List<string> _listUrl = new List<string>();
-        private int _num;
-
+        private CancellationTokenSource _cancel = new CancellationTokenSource();
         private async Task ExecuteRunCommand()
         {
             try
             {
+                if (!IsBusy)
+                {
+                    _cancel.Cancel();
+                    return;
+                }
                 IsBusy = false;
+                TextScan = "Cancel";
                 Emails.Clear();
                 PhoneNums.Clear();
                 Logs.Clear();
@@ -225,6 +249,7 @@ namespace ScannerTool.ViewModels
                     _listUrl.Add(UrlScanData);
                     while (true)
                     {
+                        if (_cancel.IsCancellationRequested) break;
                         await RequestSite(_listUrl[_num]);
                         _num++;
 
@@ -238,13 +263,10 @@ namespace ScannerTool.ViewModels
             {
                 MessageBox.Show(e.Message, "Notification", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            finally
-            {
-                IsBusy = true;
-            }
-        }
 
-        private int _numScanUrl = 1;
+            TextScan = "Scan";
+            IsBusy = true;
+        }
 
         /// <summary>
         /// sacn url
