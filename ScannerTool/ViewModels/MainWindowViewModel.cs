@@ -1,7 +1,10 @@
 ﻿using Ookii.Dialogs.Wpf;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using Prism.Commands;
 using Prism.Mvvm;
 using RestSharp;
+using ScannerTool.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,13 +15,15 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 
 namespace ScannerTool.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
         private string _title = "Scan Email And Phone Number Tool";
-
+        private string _facebook = "https://www.facebook.com/";
         public string Title
         {
             get { return _title; }
@@ -26,15 +31,15 @@ namespace ScannerTool.ViewModels
         }
 
         private DelegateCommand _runCommand;
-        private string _urlScanData;
+        private string _urlScanData = "https://www.facebook.com/groups/j2team.community";
         private ObservableCollection<Item> _emails = new ObservableCollection<Item>();
         private ObservableCollection<Item> _phoneNums = new ObservableCollection<Item>();
         private int _numScanUrl = 1;
         private string _textScan = "Scan";
         private List<string> _listUrl = new List<string>();
         private int _num;
-        private string _cookie;
-
+        private string _cookie = @"sb=oMKRYkzysM6HwZPpZUdY2qyX; datr=oMKRYnAoS9xH_cnB56xSg5-Z; c_user=100027295904383; m_pixel_ratio=1; x-referer=eyJyIjoiL2dyb3Vwcy8zNjQ5OTc2MjcxNjU2OTc%2Fdmlldz1pbmZvIiwiaCI6Ii9ncm91cHMvMzY0OTk3NjI3MTY1Njk3P3ZpZXc9aW5mbyIsInMiOiJtIn0%3D; wd=1409x929; xs=47%3AaWTDjQ0bomZzpA%3A2%3A1654102572%3A-1%3A2769%3A%3AAcVCB5rYhuMuf7btx8Lug3D2aDo21CiUnrq90P0ETg; fr=0UVw4oNrbgMmTZvhL.AWX9yC0LYvPlPcoCqU1RBBmlDeA.BirgHr.ot.AAA.0.0.Birg1w.AWVgzpeAaVI; presence=C%7B%22t3%22%3A%5B%5D%2C%22utc3%22%3A1655573886203%2C%22v%22%3A1%7D";
+        private ChromeDriver _chromeDriver;
         public string Cookie
         {
             get => _cookie;
@@ -88,7 +93,7 @@ namespace ScannerTool.ViewModels
             _exportDataCommand ?? (_exportDataCommand = new DelegateCommand(() => ExecuteExportDataCommand()));
 
         private ObservableCollection<Item> _logs = new ObservableCollection<Item>();
-
+        public TypeFunctionModel TypeFunctionModel { get; set; } = new TypeFunctionModel();
         public MainWindowViewModel()
         {
         }
@@ -123,12 +128,21 @@ namespace ScannerTool.ViewModels
                         if (selectedPaths != null && selectedPaths[0] != null)
                         {
                             var name = new Uri(UrlScanData);
-                            var pathEmail = selectedPaths[0] + "\\email_" + name.Authority.Replace(".", "_") + "_" + DateTime.Now.Ticks + ".txt";
-                            var pathPhone = selectedPaths[0] + "\\phone_" + DateTime.Now.Ticks + ".txt";
-                            await File.WriteAllTextAsync(pathEmail, string.Join("\n", Emails.Select(e => e.Title)));
-                            await File.WriteAllTextAsync(pathPhone, string.Join("\n", PhoneNums.Select(e => e.Title)));
-                            Process.Start(pathPhone);
-                            Process.Start(pathEmail);
+
+                            if (Emails.Any())
+                            {
+                                var pathEmail = selectedPaths[0] + "\\email_" + name.Authority.Replace(".", "_") + "_" + DateTime.Now.Ticks + ".txt";
+                                await File.WriteAllTextAsync(pathEmail, string.Join("\n", Emails.Select(e => e.Title)));
+                                //Process.Start(pathEmail, @"C:\Windows\win.ini");
+                            }
+
+                            if (PhoneNums.Any())
+                            {
+                                var pathPhone = selectedPaths[0] + "\\phone_" + DateTime.Now.Ticks + ".txt";
+                                await File.WriteAllTextAsync(pathPhone, string.Join("\n", PhoneNums.Select(e => e.Title)));
+                                //Process.Start(pathPhone, @"C:\Windows\win.ini");
+                            }
+                            MessageBox.Show("Save file successful");
                         }
                     }
                 }
@@ -159,7 +173,8 @@ namespace ScannerTool.ViewModels
                 {
                     _ = ScanEmail(content);
                     _ = ScanPhoneNum(content);
-                    await ScanUrl(content);
+                    if (TypeFunctionModel.CheckTypeFunction() == 1)
+                        await ScanUrl(content);
                 }
             }
             catch (Exception e)
@@ -235,10 +250,7 @@ namespace ScannerTool.ViewModels
                     return;
                 }
                 IsBusy = false;
-                TextScan = "Cancel";
-                Emails.Clear();
-                PhoneNums.Clear();
-                Logs.Clear();
+
                 if (string.IsNullOrWhiteSpace(UrlScanData))
                 {
                     MessageBox.Show("Chưa nhập url cần quét email số điện thoại");
@@ -246,17 +258,26 @@ namespace ScannerTool.ViewModels
                 else
                 {
                     UrlScanData = UrlScanData[UrlScanData.Length - 1] == '/' ? UrlScanData : UrlScanData + "/";
-                    _listUrl.Add(UrlScanData);
-                    while (true)
+                    TextScan = "Cancel";
+                    Emails.Clear();
+                    PhoneNums.Clear();
+                    Logs.Clear();
+                    switch (TypeFunctionModel.CheckTypeFunction())
                     {
-                        if (_cancel.IsCancellationRequested) break;
-                        await RequestSite(_listUrl[_num]);
-                        _num++;
-
-                        if (_num == _listUrl.Count) break;
+                        case 1:
+                            await ScanDataWebsite();
+                            MessageBox.Show("Quét dữ liệu xong");
+                            break;
+                        case 2:
+                            MessageBox.Show("Quét dữ liệu xong");
+                            break;
+                        case 3:
+                            await ScanDatGroup();
+                            break;
+                        default:
+                            MessageBox.Show("Xẩy ra lỗi vui lòng thử lại !");
+                            break;
                     }
-
-                    MessageBox.Show("Quét dữ liệu xong");
                 }
             }
             catch (Exception e)
@@ -266,6 +287,115 @@ namespace ScannerTool.ViewModels
 
             TextScan = "Scan";
             IsBusy = true;
+        }
+
+        private async Task ScanDatGroup()
+        {
+            if (Cookie == null)
+            {
+                MessageBox.Show("Tính năng này cần đăng nhập facebook! vui long cung cấp cookie facebook!");
+                return;
+            }
+
+            Cookie = Cookie.Replace(" ", "");
+
+            var driverService = ChromeDriverService.CreateDefaultService();
+            driverService.HideCommandPromptWindow = true;
+            ChromeOptions option = new ChromeOptions();
+            _chromeDriver = new ChromeDriver(driverService, option);
+            _chromeDriver.Manage().Window.Size = new Size(250, 844);
+            _chromeDriver.Manage().Window.Position = new Point(0, 0);
+            _chromeDriver.Navigate().GoToUrl(_facebook);
+
+            var ck = Cookie.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var c in ck)
+            {
+                var value = c.Split('=', StringSplitOptions.RemoveEmptyEntries);
+                _chromeDriver.Manage().Cookies.AddCookie(new Cookie(value[0], value[1]));
+            }
+
+            _chromeDriver.Navigate().GoToUrl(UrlScanData + "members");
+            var source = "<html";
+            while (true)
+            {
+                if (_cancel.IsCancellationRequested) break;
+                await Task.Delay(Random.Shared.Next(4000, 5000));
+                var pageSource = _chromeDriver.PageSource;
+                //new Actions(_chromeDriver).SendKeys(keysToSend: Keys.PageDown).Build().Perform();
+
+                var js = (IJavaScriptExecutor)_chromeDriver;
+                js.ExecuteScript("window.scrollBy(0, 10000)");
+
+                if (source == pageSource)
+                {
+                    break;
+                }
+
+                await ScanUid(pageSource.Replace(source, ""));
+                source = pageSource;
+            }
+
+            if (_lsUid.Count > 0)
+                foreach (var u in _lsUid)
+                {
+                    if (_cancel.IsCancellationRequested) break;
+                    var about = $"https://www.facebook.com/{u}/about";
+                    _chromeDriver.Navigate().GoToUrl(about);
+                    await Task.Delay(1000);
+                    var pageSource = _chromeDriver.PageSource;
+                    if (pageSource != null)
+                    {
+                        _ = ScanEmail(pageSource);
+                        _ = ScanPhoneNum(pageSource);
+                    }
+
+                    Logs.Insert(0, new Item($"{_numScanUrl} : [{DateTime.Now.ToString("G")}] " + about));
+                    _numScanUrl++;
+                }
+
+            MessageBox.Show("Quét dữ liệu xong");
+            _chromeDriver.Close();
+            _chromeDriver.Quit();
+        }
+
+        private List<string> _lsUid = new List<string>();
+        private Task ScanUid(string content)
+        {
+            _ = ScanEmail(content);
+            _ = ScanPhoneNum(content);
+            var pt = @"/user/(.*?)/";
+            var machs = Regex.Matches(content, pt);
+            if (machs != null & machs.Count > 0)
+            {
+                foreach (Match mach in machs)
+                {
+                    var uid = mach?.Groups["1"]?.Value;
+                    if (uid != null && !_lsUid.Contains(uid))
+                    {
+                        //var about = $"https://www.facebook.com/{uid}/about";
+
+                        _lsUid.Add(uid);
+                        Logs.Insert(0, new Item($"{_numScanUrl} : [{DateTime.Now.ToString("G")}] " + uid));
+                        _numScanUrl++;
+
+                        //var html = RequestSite(about);
+                    }
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+        private async Task ScanDataWebsite()
+        {
+            _listUrl.Add(UrlScanData);
+            while (true)
+            {
+                if (_cancel.IsCancellationRequested) break;
+                await RequestSite(_listUrl[_num]);
+                _num++;
+
+                if (_num == _listUrl.Count) break;
+            }
         }
 
         /// <summary>

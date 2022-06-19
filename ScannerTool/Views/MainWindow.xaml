@@ -11,6 +11,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
             <RowDefinition Height="200" />
@@ -48,18 +49,27 @@
                 Command="{Binding RunCommand}"
                 Content="{Binding TextScan}" />
         </Grid>
-        <GroupBox
+        <WrapPanel
             Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Orientation="Horizontal">
+            <RadioButton Margin="5" IsChecked="{Binding TypeFunctionModel.IsWebsite}">Website</RadioButton>
+            <RadioButton Margin="5" IsChecked="{Binding TypeFunctionModel.IsPostFacebook}">Post Facebook</RadioButton>
+            <RadioButton Margin="5" IsChecked="{Binding TypeFunctionModel.IsGroupMember}">Group Member</RadioButton>
+        </WrapPanel>
+        <GroupBox
+            Grid.Row="2"
             Grid.Column="0"
             Header="Email">
             <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Emails}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Title}" Header="Phone" />
+                    <DataGridTextColumn Binding="{Binding Title}" Header="Email" />
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
         <GroupBox
-            Grid.Row="1"
+            Grid.Row="2"
             Grid.Column="1"
             Header="Phone">
             <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding PhoneNums}">
@@ -69,17 +79,18 @@
             </DataGrid>
         </GroupBox>
         <Button
-            Grid.Row="2"
+            Grid.Row="3"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Width="300"
             Margin="5"
+            VerticalAlignment="Center"
             Command="{Binding ExportDataCommand}"
             Content="Export Data"
             FontSize="18"
             IsEnabled="{Binding IsBusy}" />
         <GroupBox
-            Grid.Row="3"
+            Grid.Row="4"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Header="Logging">
