@@ -31,14 +31,14 @@ namespace ScannerTool.ViewModels
         }
 
         private DelegateCommand _runCommand;
-        private string _urlScanData = "https://www.facebook.com/groups/j2team.community";
+        private string _urlScanData ;
         private ObservableCollection<Item> _emails = new ObservableCollection<Item>();
         private ObservableCollection<Item> _phoneNums = new ObservableCollection<Item>();
         private int _numScanUrl = 1;
         private string _textScan = "Scan";
         private List<string> _listUrl = new List<string>();
         private int _num;
-        private string _cookie = @"sb=oMKRYkzysM6HwZPpZUdY2qyX; datr=oMKRYnAoS9xH_cnB56xSg5-Z; c_user=100027295904383; m_pixel_ratio=1; x-referer=eyJyIjoiL2dyb3Vwcy8zNjQ5OTc2MjcxNjU2OTc%2Fdmlldz1pbmZvIiwiaCI6Ii9ncm91cHMvMzY0OTk3NjI3MTY1Njk3P3ZpZXc9aW5mbyIsInMiOiJtIn0%3D; wd=1409x929; xs=47%3AaWTDjQ0bomZzpA%3A2%3A1654102572%3A-1%3A2769%3A%3AAcVCB5rYhuMuf7btx8Lug3D2aDo21CiUnrq90P0ETg; fr=0UVw4oNrbgMmTZvhL.AWX9yC0LYvPlPcoCqU1RBBmlDeA.BirgHr.ot.AAA.0.0.Birg1w.AWVgzpeAaVI; presence=C%7B%22t3%22%3A%5B%5D%2C%22utc3%22%3A1655573886203%2C%22v%22%3A1%7D";
+        private string _cookie ;
         private ChromeDriver _chromeDriver;
         public string Cookie
         {
