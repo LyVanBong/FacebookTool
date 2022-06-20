@@ -31,15 +31,16 @@ namespace ScannerTool.ViewModels
         }
 
         private DelegateCommand _runCommand;
-        private string _urlScanData ;
+        private string _urlScanData;
         private ObservableCollection<Item> _emails = new ObservableCollection<Item>();
         private ObservableCollection<Item> _phoneNums = new ObservableCollection<Item>();
         private int _numScanUrl = 1;
         private string _textScan = "Scan";
         private List<string> _listUrl = new List<string>();
         private int _num;
-        private string _cookie ;
+        private string _cookie;
         private ChromeDriver _chromeDriver;
+        private Dictionary<string, string> _dicNhaMang = new Dictionary<string, string>();
         public string Cookie
         {
             get => _cookie;
@@ -84,7 +85,20 @@ namespace ScannerTool.ViewModels
         public bool IsBusy
         {
             get => _isBusy;
-            set => SetProperty(ref _isBusy, value);
+            set
+            {
+                if (SetProperty(ref _isBusy, value))
+                {
+                    if (value)
+                    {
+                        Title = "Scan Email And Phone Number Tool";
+                    }
+                    else
+                    {
+                        Title = "Scan Email And Phone Number Tool (Đang quét dữ liệu)";
+                    }
+                }
+            }
         }
 
         private DelegateCommand _exportDataCommand;
@@ -94,10 +108,77 @@ namespace ScannerTool.ViewModels
 
         private ObservableCollection<Item> _logs = new ObservableCollection<Item>();
         public TypeFunctionModel TypeFunctionModel { get; set; } = new TypeFunctionModel();
+        private string _textConvertNumPhone = "Đầu số quốc tế";
+        public string TextConvertNumPhone
+        {
+            get { return _textConvertNumPhone; }
+            set { SetProperty(ref _textConvertNumPhone, value); }
+        }
+        private DelegateCommand _convertNumPhoneDataCommand;
+        public DelegateCommand ConvertNumPhoneDataCommand =>
+            _convertNumPhoneDataCommand ?? (_convertNumPhoneDataCommand = new DelegateCommand(ExecuteConvertNumPhoneDataCommand));
+
+        private bool _isNumPhoneVn = true;
         public MainWindowViewModel()
         {
-        }
+            #region nha mang
 
+            var viettel = "039,038,037,036,035,034,033,032,098,097,096,086";
+            var lsVietTel = viettel.Split(',');
+            foreach (var s1 in lsVietTel)
+            {
+                _dicNhaMang.Add(s1, "Viettel");
+            }
+            var vinaPhone = "082,081,085,084,083,094,091,088";
+            var lsVina = vinaPhone.Split(',');
+            foreach (var s1 in lsVina)
+            {
+                _dicNhaMang.Add(s1, "Vinaphone");
+            }
+            var mobifone = "078,076,077,079,070,093,090,089";
+            var lsmobifone = mobifone.Split(',');
+            foreach (var s1 in lsmobifone)
+            {
+                _dicNhaMang.Add(s1, "Mobifone");
+            }
+            var vietNameMobile = "092,056,058";
+            var lsVietNameMobile = vietNameMobile.Split(',');
+            foreach (var s1 in lsVietNameMobile)
+            {
+                _dicNhaMang.Add(s1, "Vietnamobile");
+            }
+            _dicNhaMang.Add("059", "Gmobile");
+            _dicNhaMang.Add("099", "Gmobile");
+            _dicNhaMang.Add("087", "Itelecom");
+
+            #endregion
+        }
+        void ExecuteConvertNumPhoneDataCommand()
+        {
+            IsBusy = false;
+            if (PhoneNums.Any())
+                if (_isNumPhoneVn)
+                {
+                    _isNumPhoneVn = false;
+                    TextConvertNumPhone = "Đầu số Việt Nam";
+                    foreach (var phoneNum in PhoneNums)
+                    {
+                        phoneNum.Title = "84" + phoneNum.Title.Substring(1, 9);
+                    }
+                }
+                else
+                {
+                    _isNumPhoneVn = true;
+                    TextConvertNumPhone = "Đầu số quốc tế";
+                    foreach (var phoneNum in PhoneNums)
+                    {
+                        phoneNum.Title = "0" + phoneNum.Title.Substring(2, 9);
+                    }
+                }
+            else MessageBox.Show("Chưa có số điện thoại");
+
+            IsBusy = true;
+        }
         private async Task ExecuteExportDataCommand()
         {
             try
@@ -184,7 +265,7 @@ namespace ScannerTool.ViewModels
         }
 
         /// <summary>
-        /// Sacn phone
+        /// scan phone
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
@@ -202,7 +283,21 @@ namespace ScannerTool.ViewModels
                         if (!string.IsNullOrWhiteSpace(s))
                         {
                             if (PhoneNums.Count(x => x.Title == s) == 0)
-                                PhoneNums.Insert(0, new Item(s));
+                            {
+                                if (s.Length == 10)
+                                {
+
+                                    var dauSo = s.Substring(0, 3);
+
+
+                                    if (_dicNhaMang.ContainsKey(dauSo))
+                                    {
+                                        var checkPhone = _dicNhaMang[dauSo];
+
+                                        PhoneNums.Insert(0, new Item(s, checkPhone));
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -450,6 +545,7 @@ namespace ScannerTool.ViewModels
     public class Item : BindableBase
     {
         private string _title;
+        private string _nhaMang;
 
         public string Title
         {
@@ -457,6 +553,17 @@ namespace ScannerTool.ViewModels
             set => SetProperty(ref _title, value);
         }
 
+        public string NhaMang
+        {
+            get => _nhaMang;
+            set => SetProperty(ref _nhaMang, value);
+        }
+
+        public Item(string phone, string nhaMang)
+        {
+            Title = phone;
+            NhaMang = nhaMang;
+        }
         public Item(string title)
         {
             _title = title;

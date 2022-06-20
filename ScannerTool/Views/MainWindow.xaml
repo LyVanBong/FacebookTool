@@ -75,20 +75,34 @@
             <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding PhoneNums}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Binding="{Binding Title}" Header="Phone" />
+                    <DataGridTextColumn Binding="{Binding NhaMang}" Header="Nhà mạng" />
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
-        <Button
+        <StackPanel
             Grid.Row="3"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            Width="300"
-            Margin="5"
-            VerticalAlignment="Center"
-            Command="{Binding ExportDataCommand}"
-            Content="Export Data"
-            FontSize="18"
-            IsEnabled="{Binding IsBusy}" />
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Button
+                Width="300"
+                Margin="5"
+                VerticalAlignment="Center"
+                Command="{Binding ExportDataCommand}"
+                Content="Export Data"
+                FontSize="18"
+                IsEnabled="{Binding IsBusy}" />
+            <Button
+                Width="300"
+                Margin="5"
+                VerticalAlignment="Center"
+                Command="{Binding ConvertNumPhoneDataCommand}"
+                Content="{Binding TextConvertNumPhone}"
+                FontSize="18"
+                IsEnabled="{Binding IsBusy}" />
+        </StackPanel>
+
         <GroupBox
             Grid.Row="4"
             Grid.Column="0"
