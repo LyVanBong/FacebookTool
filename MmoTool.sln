@@ -15,11 +15,13 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ScannerTool", "Setups\Scann
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OnlineTool", "OnlineTool", "{3B6A06F9-8335-407F-ACC6-27EEFB020746}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineTool.Server", "OnlineTool\Server\OnlineTool.Server.csproj", "{756E2C9B-302D-4001-8347-16641868D343}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineTool.Server", "OnlineTool\Server\OnlineTool.Server.csproj", "{756E2C9B-302D-4001-8347-16641868D343}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineTool.Client", "OnlineTool\Client\OnlineTool.Client.csproj", "{2070C3E3-4893-440A-BDFC-1080B49D6009}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineTool.Client", "OnlineTool\Client\OnlineTool.Client.csproj", "{2070C3E3-4893-440A-BDFC-1080B49D6009}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineTool.Shared", "OnlineTool\Shared\OnlineTool.Shared.csproj", "{EAF4E194-5AEA-4FBB-9D29-4037FF24720B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineTool.Shared", "OnlineTool\Shared\OnlineTool.Shared.csproj", "{EAF4E194-5AEA-4FBB-9D29-4037FF24720B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZaloTool", "ZaloTool\ZaloTool.csproj", "{D12BD689-D567-4F66-ACE4-B7B235854D02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{EAF4E194-5AEA-4FBB-9D29-4037FF24720B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAF4E194-5AEA-4FBB-9D29-4037FF24720B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAF4E194-5AEA-4FBB-9D29-4037FF24720B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D12BD689-D567-4F66-ACE4-B7B235854D02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D12BD689-D567-4F66-ACE4-B7B235854D02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D12BD689-D567-4F66-ACE4-B7B235854D02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D12BD689-D567-4F66-ACE4-B7B235854D02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
