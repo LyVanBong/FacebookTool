@@ -8,8 +8,8 @@
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
     <PackageReference Include="Prism.Unity" Version="8.1.97" />
     <PackageReference Include="RestSharp" Version="108.0.1" />
-    <PackageReference Include="Selenium.WebDriver" Version="4.2.0" />
-    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="102.0.5005.6102" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.3.0" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="103.0.5060.5300" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />

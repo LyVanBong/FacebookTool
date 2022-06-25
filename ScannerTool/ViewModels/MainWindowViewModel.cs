@@ -24,6 +24,7 @@ namespace ScannerTool.ViewModels
     {
         private string _title = "Scan Email And Phone Number Tool";
         private string _facebook = "https://www.facebook.com/";
+
         public string Title
         {
             get { return _title; }
@@ -41,6 +42,7 @@ namespace ScannerTool.ViewModels
         private string _cookie;
         private ChromeDriver _chromeDriver;
         private Dictionary<string, string> _dicNhaMang = new Dictionary<string, string>();
+
         public string Cookie
         {
             get => _cookie;
@@ -109,16 +111,20 @@ namespace ScannerTool.ViewModels
         private ObservableCollection<Item> _logs = new ObservableCollection<Item>();
         public TypeFunctionModel TypeFunctionModel { get; set; } = new TypeFunctionModel();
         private string _textConvertNumPhone = "Đầu số quốc tế";
+
         public string TextConvertNumPhone
         {
             get { return _textConvertNumPhone; }
             set { SetProperty(ref _textConvertNumPhone, value); }
         }
+
         private DelegateCommand _convertNumPhoneDataCommand;
+
         public DelegateCommand ConvertNumPhoneDataCommand =>
             _convertNumPhoneDataCommand ?? (_convertNumPhoneDataCommand = new DelegateCommand(ExecuteConvertNumPhoneDataCommand));
 
         private bool _isNumPhoneVn = true;
+
         public MainWindowViewModel()
         {
             #region nha mang
@@ -151,9 +157,10 @@ namespace ScannerTool.ViewModels
             _dicNhaMang.Add("099", "Gmobile");
             _dicNhaMang.Add("087", "Itelecom");
 
-            #endregion
+            #endregion nha mang
         }
-        void ExecuteConvertNumPhoneDataCommand()
+
+        private void ExecuteConvertNumPhoneDataCommand()
         {
             IsBusy = false;
             if (PhoneNums.Any())
@@ -179,6 +186,7 @@ namespace ScannerTool.ViewModels
 
             IsBusy = true;
         }
+
         private async Task ExecuteExportDataCommand()
         {
             try
@@ -286,9 +294,7 @@ namespace ScannerTool.ViewModels
                             {
                                 if (s.Length == 10)
                                 {
-
                                     var dauSo = s.Substring(0, 3);
-
 
                                     if (_dicNhaMang.ContainsKey(dauSo))
                                     {
@@ -335,6 +341,7 @@ namespace ScannerTool.ViewModels
         }
 
         private CancellationTokenSource _cancel = new CancellationTokenSource();
+
         private async Task ExecuteRunCommand()
         {
             try
@@ -363,12 +370,15 @@ namespace ScannerTool.ViewModels
                             await ScanDataWebsite();
                             MessageBox.Show("Quét dữ liệu xong");
                             break;
+
                         case 2:
                             MessageBox.Show("Quét dữ liệu xong");
                             break;
+
                         case 3:
                             await ScanDatGroup();
                             break;
+
                         default:
                             MessageBox.Show("Xẩy ra lỗi vui lòng thử lại !");
                             break;
@@ -454,6 +464,7 @@ namespace ScannerTool.ViewModels
         }
 
         private List<string> _lsUid = new List<string>();
+
         private Task ScanUid(string content)
         {
             _ = ScanEmail(content);
@@ -564,6 +575,7 @@ namespace ScannerTool.ViewModels
             Title = phone;
             NhaMang = nhaMang;
         }
+
         public Item(string title)
         {
             _title = title;

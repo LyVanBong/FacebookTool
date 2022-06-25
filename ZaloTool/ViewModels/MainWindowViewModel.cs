@@ -4,7 +4,8 @@ namespace ZaloTool.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        private string _title = "Prism Application";
+        private string _title = "Zalo Marketing Online";
+
         public string Title
         {
             get { return _title; }
@@ -13,7 +14,7 @@ namespace ZaloTool.ViewModels
 
         public MainWindowViewModel()
         {
-
+           
         }
     }
 }

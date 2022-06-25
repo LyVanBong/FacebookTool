@@ -1,10 +1,28 @@
-﻿<Window x:Class="ZaloTool.Views.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:prism="http://prismlibrary.com/"
-        prism:ViewModelLocator.AutoWireViewModel="True"
-        Title="{Binding Title}" Height="350" Width="525" >
+﻿<Window
+    x:Class="ZaloTool.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:prism="http://prismlibrary.com/"
+    xmlns:views="clr-namespace:ZaloTool.Views"
+    Title="{Binding Title}"
+    Width="Auto"
+    Height="Auto"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    WindowStartupLocation="CenterScreen">
     <Grid>
-        <ContentControl prism:RegionManager.RegionName="ContentRegion" />
+        <TabControl>
+            <TabItem Header="Tài khoản">
+                <views:AccountView />
+            </TabItem>
+            <TabItem Header="Gửi tin nhắn cho bạn bè">
+                <views:SendMessageMyFriendsView />
+            </TabItem>
+            <TabItem Header="Gửi tin nhắn qua số điện thoại">
+                <views:SendMessagePhoneNumberView />
+            </TabItem>
+            <TabItem Header="Kết bạn qua số điện thoại">
+                <views:AddFriendsPhoneNumberView />
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

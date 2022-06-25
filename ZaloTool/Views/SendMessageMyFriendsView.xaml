@@ -1,0 +1,10 @@
+﻿<UserControl
+    x:Class="ZaloTool.Views.SendMessageMyFriendsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:prism="http://prismlibrary.com/"
+    prism:ViewModelLocator.AutoWireViewModel="True">
+    <Grid>
+        <Label Content="Gửi tin nhắn cho bạn bè" />
+    </Grid>
+</UserControl>

@@ -1,0 +1,44 @@
+﻿<UserControl
+    x:Class="ZaloTool.Views.AccountView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:prism="http://prismlibrary.com/"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    Background="#fff">
+    <Grid IsEnabled="{Binding IsBusy}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <GroupBox Header="Số điện thoại">
+                <TextBox
+                    Width="250"
+                    VerticalContentAlignment="Center"
+                    Text="{Binding AccountZalo.PhoneNumber}" />
+            </GroupBox>
+            <GroupBox Header="Tên Zalo">
+                <TextBox
+                    Width="250"
+                    VerticalContentAlignment="Center"
+                    Text="{Binding AccountZalo.ZaloName}" />
+            </GroupBox>
+            <Button
+                Margin="5"
+                Padding="10"
+                Command="{Binding LoginZaloCommand}"
+                Content="Đăng nhập zalo" />
+        </StackPanel>
+        <GroupBox Grid.Row="1" Header="Danh sách tài khoản zalo">
+            <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding AccountZalos}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding PhoneNumber}" Header="Số điện thoại" />
+                    <DataGridTextColumn Binding="{Binding ZaloName}" Header="Tên Zalo" />
+                    <DataGridTextColumn Binding="{Binding FriendNumber}" Header="Số bạn bè" />
+                    <DataGridTextColumn Binding="{Binding Status}" Header="Status" />
+                    <DataGridTextColumn Binding="{Binding Running}" Header="Running" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+    </Grid>
+</UserControl>

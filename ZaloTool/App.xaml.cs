@@ -1,5 +1,6 @@
 ﻿using Prism.Ioc;
 using System.Windows;
+using ZaloTool.Services;
 using ZaloTool.Views;
 
 namespace ZaloTool
@@ -16,7 +17,7 @@ namespace ZaloTool
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-
+            containerRegistry.Register<IChromeBrowserService, ChromeBrowserService>();
         }
     }
 }

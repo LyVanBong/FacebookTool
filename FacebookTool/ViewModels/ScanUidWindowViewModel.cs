@@ -1,15 +1,14 @@
-﻿using System;
+﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using Prism.Commands;
+using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using Prism.Commands;
-using Prism.Mvvm;
-using RestSharp;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -38,6 +37,7 @@ namespace FacebookTool.ViewModels
             get => _uids;
             set => SetProperty(ref _uids, value);
         }
+
         private DelegateCommand _scanUidCommand;
 
         public DelegateCommand ScanUidCommand =>
@@ -51,6 +51,7 @@ namespace FacebookTool.ViewModels
         private string _controllerGroup = "browse/group/members/?id=";
         private List<string> _lsUrl;
         private int _num;
+
         private async Task ExecuteScanUidCommand()
         {
             if (IsRunApp) return;
@@ -99,6 +100,7 @@ namespace FacebookTool.ViewModels
         }
 
         private ChromeDriver _chromeDriver;
+
         private async Task RequestSite(string url)
         {
             try
