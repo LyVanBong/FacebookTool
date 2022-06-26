@@ -9,7 +9,7 @@
     Height="Auto"
     prism:ViewModelLocator.AutoWireViewModel="True"
     WindowStartupLocation="CenterScreen">
-    <Grid>
+    <Grid IsEnabled="{Binding IsBusy}">
         <TabControl>
             <TabItem Header="Tài khoản">
                 <views:AccountView />

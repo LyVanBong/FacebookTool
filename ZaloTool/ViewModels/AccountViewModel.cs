@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Mvvm;
-using RestSharp;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -18,7 +17,7 @@ namespace ZaloTool.ViewModels
 {
     public class AccountViewModel : BindableBase
     {
-        private string _pathChromeProfileDefault = Directory.GetCurrentDirectory() + "/ChromeProfile";
+        private string _pathChromeProfileDefault = Directory.GetCurrentDirectory() + "\\ChromeProfile";
         private IChromeBrowserService _chromeBrowserService;
         private ZaloToolContext _dbZalo = new ZaloToolContext();
         private DelegateCommand _loginZaloCommand;
@@ -47,11 +46,12 @@ namespace ZaloTool.ViewModels
             _chromeBrowserService = chromeBrowserService;
             _ = CreateDefaultData();
         }
+
         /// <summary>
         /// Khởi tạo dữ liệu ban đầu
         /// </summary>
         /// <returns></returns>
-        private async Task CreateDefaultData()
+        private Task CreateDefaultData()
         {
             try
             {
@@ -61,20 +61,6 @@ namespace ZaloTool.ViewModels
                 {
                     AccountZalos.AddRange(_dbZalo.AccountZalos);
                 }
-
-                if (!Directory.Exists(_pathChromeProfileDefault))
-                {
-                    IsBusy = false;
-                    Directory.CreateDirectory(_pathChromeProfileDefault);
-                    var client = new RestClient();
-                    var stream = await client.DownloadDataAsync(new RestRequest(
-                        "https://drive.google.com/u/2/uc?id=1pDd1N3VqO_f-UuC-73h8NOsWEjqhV5FS&export=download&confirm=t"));
-                    if (stream != null)
-                    {
-                        await File.WriteAllBytesAsync(_pathChromeProfileDefault + "\\ChromeProfileDefault.zip", stream);
-                        //ZipFile.ExtractToDirectory(_pathChromeProfileDefault + "\\ChromeProfileDefault.zip", _pathChromeProfileDefault + "\\ChromeProfileDefault", true);
-                    }
-                }
             }
             catch (Exception e)
             {
@@ -82,6 +68,7 @@ namespace ZaloTool.ViewModels
             }
 
             IsBusy = true;
+            return Task.CompletedTask;
         }
 
         private async Task ExecuteLoginZaloCommand()
@@ -115,7 +102,7 @@ namespace ZaloTool.ViewModels
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error");
+                MessageBox.Show("Error: " + e.Message);
             }
             IsBusy = true;
         }

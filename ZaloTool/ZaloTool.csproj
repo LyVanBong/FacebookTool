@@ -5,6 +5,16 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\Images\delete.png" />
+    <None Remove="Assets\Images\relogin.png" />
+    <None Remove="Assets\Images\updated.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Images\delete.png" />
+    <EmbeddedResource Include="Assets\Images\relogin.png" />
+    <EmbeddedResource Include="Assets\Images\updated.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

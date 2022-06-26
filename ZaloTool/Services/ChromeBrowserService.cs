@@ -11,17 +11,9 @@ public class ChromeBrowserService : IChromeBrowserService
     {
 
     }
-    public Task<bool> LoginZalo(string pathChromeProfile)
+    public async Task<bool> LoginZalo(string pathChromeProfile)
     {
-        ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.BinaryLocation = binaryLocationChrome;
-        chromeOptions.AddExcludedArgument("enable-automation");
-        chromeOptions.AddUserProfilePreference("credentials_enable_service", false);
-        chromeOptions.AddUserProfilePreference("profile.password_manager_enabled", false);
-        chromeOptions.AddArgument(@"user-data-dir=" + pathChromeProfile);
-        ChromeDriverService chromeDriverService = ChromeDriverService.CreateDefaultService();
-        chromeDriverService.HideCommandPromptWindow = true;
-        ChromeDriver driver = new ChromeDriver(chromeDriverService, chromeOptions);
+        ChromeDriver driver = await OpenChrome(pathChromeProfile);
 
         driver.Navigate().GoToUrl("https://id.zalo.me/");
 
@@ -31,8 +23,21 @@ public class ChromeBrowserService : IChromeBrowserService
             if (cookies == null)
             {
                 driver.Close();
-                return Task.FromResult(true);
+                return true;
             }
         }
+    }
+
+    public Task<ChromeDriver> OpenChrome(string pathChromeProfile)
+    {
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.BinaryLocation = binaryLocationChrome;
+        chromeOptions.AddExcludedArgument("enable-automation");
+        chromeOptions.AddUserProfilePreference("credentials_enable_service", false);
+        chromeOptions.AddUserProfilePreference("profile.password_manager_enabled", false);
+        chromeOptions.AddArgument(@"user-data-dir=" + pathChromeProfile);
+        ChromeDriverService chromeDriverService = ChromeDriverService.CreateDefaultService();
+        chromeDriverService.HideCommandPromptWindow = true;
+        return Task.FromResult(new ChromeDriver(chromeDriverService, chromeOptions));
     }
 }

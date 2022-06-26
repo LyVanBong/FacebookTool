@@ -3,8 +3,225 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:prism="http://prismlibrary.com/"
-    prism:ViewModelLocator.AutoWireViewModel="True">
-    <Grid>
-        <Label Content="Gửi tin nhắn bằng số điện thoại" />
-    </Grid>
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    Background="#fff">
+    <ScrollViewer>
+        <Grid IsEnabled="{Binding IsBusy}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="500" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <GroupBox
+                Grid.Row="0"
+                Grid.Column="0"
+                Header="Tài khoản người gửi tin nhắn">
+                <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding AccountZalos}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding PhoneNumber}" Header="Số điện thoại" />
+                        <DataGridTextColumn Binding="{Binding ZaloName}" Header="Tên Zalo" />
+                        <DataGridTextColumn Binding="{Binding Status}" Header="Status" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+            <GroupBox
+                Grid.Row="1"
+                Grid.Column="0"
+                Header="Danh sách số điện thoại">
+                <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding PhoneZalos}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding PhoneNumber}" Header="Số điện thoại" />
+                        <DataGridTextColumn Binding="{Binding ZaloName}" Header="Tên Zalo" />
+                        <DataGridTextColumn Binding="{Binding Status}" Header="Status" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+            <Grid
+                Grid.Row="0"
+                Grid.RowSpan="2"
+                Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <GroupBox
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Header="Soạn nội dung gửi tin">
+                    <TextBox
+                        AcceptsReturn="True"
+                        Text="{Binding Setting.Message}"
+                        TextWrapping="Wrap" />
+                </GroupBox>
+                <CheckBox
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    VerticalAlignment="Center"
+                    Content="Tự động gửi kết bạn"
+                    IsChecked="{Binding Setting.IsAutoAddFriend}" />
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Content="Số tin nhăn gửi / tài khoản" />
+                <TextBox
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="2"
+                    Margin="3"
+                    VerticalContentAlignment="Center"
+                    Text="{Binding Setting.AmountMessage}" />
+                <Label
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Content="Thời gian nghỉ giữa 2 lần gửi" />
+                <TextBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Margin="3"
+                    VerticalContentAlignment="Center"
+                    Text="{Binding Setting.TimeSleep}" />
+                <Label
+                    Grid.Row="3"
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    Content="(Giây)" />
+
+                <Label
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Content="Tải hình ảnh/video" />
+                <TextBox
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    Margin="3"
+                    VerticalContentAlignment="Center"
+                    IsReadOnly="True"
+                    Text="{Binding Setting.PathMediaMessage}" />
+                <Button
+                    Grid.Row="4"
+                    Grid.Column="2"
+                    Width="100"
+                    Margin="3"
+                    Command="{Binding UpMediaMessageCommand}"
+                    Content="Tải file" />
+
+                <Label
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Content="Thêm số điện thoại cần gửi" />
+                <TextBox
+                    Grid.Row="5"
+                    Grid.Column="1"
+                    Margin="3"
+                    VerticalContentAlignment="Center"
+                    IsReadOnly="True"
+                    Text="{Binding Setting.PathPhoneNumber}" />
+                <Button
+                    Grid.Row="5"
+                    Grid.Column="2"
+                    Width="100"
+                    Margin="3"
+                    Command="{Binding UpPhoneNumberCommand}"
+                    Content="Tải SĐT" />
+
+                <CheckBox
+                    Grid.Row="6"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    VerticalAlignment="Center"
+                    Content="Hiển thị trình duyệt web khi gửi tin nhắn (Lưu ý: Không được thao tác trên trình duyệt khi phần mềm đang chạy)"
+                    IsChecked="{Binding Setting.IsShowBrowser}" />
+
+                <ProgressBar
+                    Grid.Row="7"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Height="10"
+                    Margin="5"
+                    IsIndeterminate="False"
+                    Maximum="99"
+                    Minimum="0"
+                    Value="{Binding Setting.ProgressBar}" />
+                <Label
+                    Grid.Row="8"
+                    Grid.Column="0"
+                    VerticalAlignment="Center">
+                    <Label.Content>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                            <Label Content="Trạng thái: " />
+                            <Label Content="{Binding Setting.Status}" />
+                        </StackPanel>
+                    </Label.Content>
+                </Label>
+                <Label
+                    Grid.Row="8"
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center">
+                    <Label.Content>
+                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                            <Label Content="Đã gửi: " />
+                            <Label Content="{Binding Setting.AmountDone}" />
+                            <Label Content="/" />
+                            <Label Content="{Binding Setting.TotalMessage}" />
+                        </StackPanel>
+                    </Label.Content>
+                </Label>
+                <Button
+                    Grid.Row="9"
+                    Grid.Column="1"
+                    Width="80"
+                    Height="40"
+                    Margin="3"
+                    HorizontalAlignment="Right"
+                    Command="{Binding StartCommand}"
+                    CommandParameter="1"
+                    Content="Bắt đầu">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSendingMessage}" Value="True">
+                                    <Setter Property="Button.IsEnabled" Value="False" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button
+                    Grid.Row="9"
+                    Grid.Column="2"
+                    Width="80"
+                    Height="40"
+                    Margin="3"
+                    HorizontalAlignment="Left"
+                    Command="{Binding StartCommand}"
+                    CommandParameter="0"
+                    Content="Dừng"
+                    IsEnabled="{Binding IsSendingMessage}" />
+            </Grid>
+        </Grid>
+    </ScrollViewer>
 </UserControl>
