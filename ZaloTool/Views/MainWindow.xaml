@@ -14,15 +14,15 @@
             <TabItem Header="Tài khoản">
                 <views:AccountView />
             </TabItem>
-            <TabItem Header="Gửi tin nhắn cho bạn bè">
+            <!--<TabItem Header="Gửi tin nhắn cho bạn bè">
                 <views:SendMessageMyFriendsView />
-            </TabItem>
+            </TabItem>-->
             <TabItem Header="Gửi tin nhắn qua số điện thoại">
                 <views:SendMessagePhoneNumberView />
             </TabItem>
-            <TabItem Header="Kết bạn qua số điện thoại">
+            <!--<TabItem Header="Kết bạn qua số điện thoại">
                 <views:AddFriendsPhoneNumberView />
-            </TabItem>
+            </TabItem>-->
         </TabControl>
     </Grid>
 </Window>

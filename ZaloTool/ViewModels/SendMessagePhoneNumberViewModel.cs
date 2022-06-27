@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using OpenQA.Selenium;
 using ZaloTool.Database;
 using ZaloTool.Models;
 using ZaloTool.Services;
@@ -56,13 +57,64 @@ namespace ZaloTool.ViewModels
             IsSendingMessage = !IsSendingMessage;
             if (parameter == "0")
             {
-
+                IsSendingMessage = false;
             }
             else if (parameter == "1")
             {
-                var account = AccountZalos[1];
-                var drive = await _chromeBrowserService.OpenChrome(account.PathChromeProfile);
-                drive.Navigate().GoToUrl("https://id.zalo.me/");
+                try
+                {
+                    if (!PhoneZalos.Any())
+                    {
+                        IsSendingMessage = false;
+                        return;
+                    }
+                    var account = AccountZalos[1];
+                    var drive = await _chromeBrowserService.OpenChrome(account.PathChromeProfile);
+                    drive.Navigate().GoToUrl("https://id.zalo.me/");
+                    await Task.Delay(8000);
+                    foreach (var phone in PhoneZalos)
+                    {
+                        if (!IsSendingMessage) break;
+                        var search = drive.FindElement(By.XPath("/html/body/div/div/div[2]/nav/div[2]/div[1]/div[1]/input"));
+                        await Task.Delay(1500);
+                        search.SendKeys(phone.PhoneNumber);
+                        await Task.Delay(1500);
+                        var sourceItem = drive.PageSource.Contains("friend-item");
+                        if (sourceItem)
+                        {
+                            var itemZalo = drive.FindElement(By.XPath(
+                                "/html/body/div/div/div[2]/nav/div[2]/div[3]/div/div[2]/div/div/div[1]/div/div[1]/div/div/div[2]/div/div[3]/div[1]/div[1]/span"));
+                            if (itemZalo != null)
+                            {
+                                itemZalo.Click();
+                                await Task.Delay(1500);
+                                var textBox = drive.FindElement(By.XPath(
+                                    "/html/body/div/div/div[2]/main/div/article/div[4]/div[3]/div/div/div/div/div[1]/div"));
+                                textBox.SendKeys(Setting.Message);
+                                await Task.Delay(1500);
+                                var send = drive.FindElement(By.XPath(
+                                    "/html/body/div/div/div[2]/main/div/article/div[4]/div[3]/div/div/div/div/div[2]/div[5]"));
+                                send.Click();
+                                phone.Status = "Đã gửi xong";
+                            }
+                        }
+                        else
+                        {
+                            phone.Status = "SDT chưa đký zalo";
+                        }
+                        search.Clear();
+                        Setting.AmountDone++;
+                        await Task.Delay(TimeSpan.FromSeconds(Setting.TimeSleep));
+                    }
+
+                    drive.Quit();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: " + e.Message);
+                }
+
+                IsSendingMessage = true;
             }
         }
         private void ExecuteUpMediaMessageCommand()

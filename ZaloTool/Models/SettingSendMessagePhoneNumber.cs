@@ -16,7 +16,7 @@ public class SettingSendMessagePhoneNumber : BindableBase
         get { return _amountMessage; }
         set { SetProperty(ref _amountMessage, value); }
     }
-    private int _timeSleep = 120;
+    private int _timeSleep = 60;
     public int TimeSleep
     {
         get { return _timeSleep; }
